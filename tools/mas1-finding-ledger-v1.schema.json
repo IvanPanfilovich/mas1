@@ -1,0 +1,2588 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openai.local/mas1/finding-ledger.v1.schema.json",
+  "title": "MAS1 v6 canonical task-instance finding ledger",
+  "description": "Normative structural schema. The MAS1 v6 prompt supplies append-only and cross-reference procedural integrity requirements.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "ledger_id",
+    "task",
+    "cutover",
+    "roots",
+    "observations",
+    "review_bases",
+    "cycles",
+    "test_evidence",
+    "repair_attempts",
+    "strategies",
+    "activities",
+    "events",
+    "telemetry"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "mas1-finding-ledger.v1"
+    },
+    "ledger_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task": {
+      "type": "object",
+      "required": [
+        "task_instance_id",
+        "workspace",
+        "created_at",
+        "ledger_path",
+        "marker_path"
+      ],
+      "properties": {
+        "task_instance_id": {
+          "$ref": "#/$defs/uuid"
+        },
+        "workspace": {
+          "type": "string",
+          "minLength": 1
+        },
+        "thread_id": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "created_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "creation_time_basis": {
+          "enum": ["ledger-registration"]
+        },
+        "ledger_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "marker_path": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "cutover": {
+      "type": "object",
+      "required": [
+        "cutover_id",
+        "prompt_sha256",
+        "legacy_reconciliation_complete"
+      ],
+      "properties": {
+        "cutover_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "prompt_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "post_cutover_boundary": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "protocol_adopted_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "protocol_adoption_evidence_refs": {
+          "$ref": "#/$defs/nonemptySortedUniqueStrings"
+        },
+        "legacy_reconciliation_complete": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    },
+    "roots": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/root"
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/observation"
+      }
+    },
+    "review_bases": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/reviewBasis"
+      }
+    },
+    "cycles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/cycle"
+      }
+    },
+    "test_evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/testEvidence"
+      }
+    },
+    "repair_attempts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/repairAttempt"
+      }
+    },
+    "strategies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/strategy"
+      }
+    },
+    "activities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/activity"
+      },
+      "minItems": 1
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    },
+    "metric_notes": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "legacy_v6_0_audit": {
+      "$ref": "#/$defs/legacyV60Audit"
+    },
+    "telemetry": {
+      "type": "object",
+      "required": [
+        "activity_inventory_complete",
+        "expected_participating_activity_count",
+        "recorded_participating_activity_count",
+        "inventory_evidence_refs",
+        "unavailable_reason"
+      ],
+      "properties": {
+        "activity_inventory_complete": {
+          "type": "boolean"
+        },
+        "expected_participating_activity_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "recorded_participating_activity_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "inventory_evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unavailable_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "activity_inventory_complete": {
+                "const": true
+              }
+            },
+            "required": [
+              "activity_inventory_complete"
+            ]
+          },
+          "then": {
+            "properties": {
+              "expected_participating_activity_count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "inventory_evidence_refs": {
+                "type": "array",
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "activity_inventory_complete": {
+                "const": false
+              }
+            },
+            "required": [
+              "activity_inventory_complete"
+            ]
+          },
+          "then": {
+            "properties": {
+              "unavailable_reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "legacyV60Audit": {
+      "const": {
+        "schema_version": "mas1-legacy-v6.0-audit-descriptor.v1",
+        "record_type": "legacy-v6.0-audit",
+        "mode": "legacy-v6.0-audit-v1",
+        "catalogue_entry_id": "CATALOGUE-LEGACY-V6-0-AUDIT-01A07819-V1",
+        "migration_id": "MIG-LEGACY-V6-0-AUDIT-01A07819-V1",
+        "task_instance_id": "01a07819-9ad8-7851-bc8f-513aa93f4dcb",
+        "workspace": "/Users/ivanf/Documents/ChatGPT/Instructons",
+        "ledger_path": "/Users/ivanf/Documents/ChatGPT/Instructons/.mas1/tasks/01a07819-9ad8-7851-bc8f-513aa93f4dcb/finding-ledger.v1.json",
+        "marker_path": "/Users/ivanf/Documents/ChatGPT/Instructons/.mas1/tasks/01a07819-9ad8-7851-bc8f-513aa93f4dcb/v6-cutover.json",
+        "migration_dir": "/Users/ivanf/Documents/ChatGPT/Instructons/.mas1/tasks/01a07819-9ad8-7851-bc8f-513aa93f4dcb/migrations/MIG-LEGACY-V6-0-AUDIT-01A07819-V1",
+        "authorization": {
+          "authorization_id": "AUTH-LEGACY-V6-0-AUDIT-01A07819-V1",
+          "schema_version": "mas1-legacy-v6.0-migration-authorization.v1",
+          "path": "/Users/ivanf/Documents/ChatGPT/Instructons/.mas1/tasks/01a07819-9ad8-7851-bc8f-513aa93f4dcb/migrations/MIG-LEGACY-V6-0-AUDIT-01A07819-V1/authorization.json",
+          "sha256": "bc46358783920eef8a159a052aec4c034fe2763b29e5ceb58f15a4343ef6d546"
+        },
+        "decision": {
+          "decision_id": "DEC-LEGACY-V6-0-AUDIT-01A07819-V1",
+          "schema_version": "mas1-legacy-v6.0-migration-decision.v1",
+          "path": "/Users/ivanf/Documents/ChatGPT/Instructons/.mas1/tasks/01a07819-9ad8-7851-bc8f-513aa93f4dcb/migrations/MIG-LEGACY-V6-0-AUDIT-01A07819-V1/decision.json",
+          "sha256": "623900dddb37aff988f00d53a0a519f6d6f33749a6947757b0e76ce2cdd7ca5e"
+        },
+        "original_representation": {
+          "ledger_schema_version": "mas1-finding-ledger.v1",
+          "cutover_id": "MAS1-6.0_20260908T075344Z",
+          "ledger_snapshot_path": "/Users/ivanf/Documents/ChatGPT/Instructons/.mas1/tasks/01a07819-9ad8-7851-bc8f-513aa93f4dcb/migrations/MIG-LEGACY-V6-0-AUDIT-01A07819-V1/before-ledger.json",
+          "ledger_sha256": "ef0aef213647b5f7bf3eb29258c6d5f43ad3044ce2cc4f6e02aec9019082e992",
+          "marker_snapshot_path": "/Users/ivanf/Documents/ChatGPT/Instructons/.mas1/tasks/01a07819-9ad8-7851-bc8f-513aa93f4dcb/migrations/MIG-LEGACY-V6-0-AUDIT-01A07819-V1/before-marker.json",
+          "marker_sha256": "d7dd7438868fb019661c267a41245a622fa6a247a1a8a9fd39b64cb26dddba49",
+          "ledger_absent_modern_fields": [
+            "post_cutover_boundary",
+            "protocol_adopted_at",
+            "protocol_adoption_evidence_refs"
+          ],
+          "marker_post_cutover_boundary": "2026-09-08T11:00:09Z",
+          "marker_absent_modern_fields": [
+            "protocol_adopted_at",
+            "protocol_adoption_evidence_refs"
+          ]
+        },
+        "transformation": {
+          "version": "legacy-v6.0-audit-descriptor-only.v1",
+          "operation": "append-one-identical-legacy_v6_0_audit-member-to-ledger-and-marker",
+          "candidate_serialization": "Preserve every original byte before the final `}\n`; append `,\n  \"legacy_v6_0_audit\": ` plus the descriptor rendered by json.dumps(ensure_ascii=False, indent=2) with every continuation line shifted two spaces, then `\n}\n`.",
+          "original_content_preservation": "All original members, collection rows, array order, object key presence, scalar types, and marker fields remain byte-for-byte in the preserved prefix."
+        },
+        "journal": {
+          "journal_id": "JOURNAL-LEGACY-V6-0-AUDIT-01A07819-V1",
+          "schema_version": "mas1-legacy-v6.0-migration-journal.v1",
+          "path": "/Users/ivanf/Documents/ChatGPT/Instructons/.mas1/tasks/01a07819-9ad8-7851-bc8f-513aa93f4dcb/migrations/MIG-LEGACY-V6-0-AUDIT-01A07819-V1/migration.journal.json",
+          "terminal_phase": "receipt_intent"
+        },
+        "receipt": {
+          "receipt_id": "RECEIPT-LEGACY-V6-0-AUDIT-01A07819-V1",
+          "schema_version": "mas1-legacy-v6.0-migration-receipt.v1",
+          "path": "/Users/ivanf/Documents/ChatGPT/Instructons/.mas1/tasks/01a07819-9ad8-7851-bc8f-513aa93f4dcb/migrations/MIG-LEGACY-V6-0-AUDIT-01A07819-V1/migration.receipt.json",
+          "binding": "identity-and-path-only; target payloads do not contain a receipt digest"
+        },
+        "original_protocol_adopted_at": null,
+        "threshold_evidence": {
+          "record_type": "threshold-evidence",
+          "observation_id": "OBS-RETRY-V2-ASTRA-PERSISTENCE-ESCAPE-002",
+          "root_cause_id": "RC-RUNTIME-RETRY-PERSISTENT-CONTRACT",
+          "root_relationship": "repair-induced",
+          "reviewed_script_sha256": "2dd557a581097a78210183e31497e236c0f84558bef53ddb283769eb3ed50252",
+          "reviewed_tests_sha256": "d5183170d4d56d5ba257fd3eeb867016028390da20673877df347e51d12dd740",
+          "original_provider_timestamp": null,
+          "original_provider_timestamp_unavailable_reason": "The completed Astra finding arrived without a provider timestamp in the available task evidence.",
+          "original_discovery_at": null,
+          "original_discovery_at_unavailable_reason": "The original second-escape discovery time is unavailable in the task evidence.",
+          "first_threshold_known_at": null,
+          "first_threshold_known_at_unavailable_reason": "The first moment the second-escape threshold became known is unavailable and is not inferred from administrative or migration timestamps.",
+          "threshold_evidence_received_at": "2026-09-11T13:10:56Z",
+          "threshold_time_basis": "auditable_receipt_upper_bound",
+          "threshold_evidence_received_at_semantics": "Local receipt of the already-completed second-escape finding before compatibility implementation; a conservative auditable upper bound, not the unavailable original discovery, provider, authorization, decision-recording, migration-selection, or apply time.",
+          "evidence_refs": [
+            "agent-result:/root/response_contract_repair_review_astra",
+            "observation:OBS-RETRY-V2-ASTRA-PERSISTENCE-ESCAPE-002",
+            "script-sha256:2dd557a581097a78210183e31497e236c0f84558bef53ddb283769eb3ed50252",
+            "tests-sha256:d5183170d4d56d5ba257fd3eeb867016028390da20673877df347e51d12dd740"
+          ]
+        }
+      }
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "nonemptySortedUniqueStrings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "nullableId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "uuidOrNull": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/uuid"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "rootRelationship": {
+      "enum": [
+        "initial",
+        "exact-recurrence",
+        "same-root-sibling",
+        "repair-induced",
+        "expected-fallout",
+        "known-still-open"
+      ]
+    },
+    "provenance": {
+      "enum": [
+        "independent",
+        "inherited",
+        "report-import",
+        "unknown"
+      ]
+    },
+    "rootState": {
+      "enum": [
+        "open",
+        "repairing",
+        "awaiting_post_repair_review",
+        "closure_pending",
+        "closed_verified",
+        "blocked"
+      ]
+    },
+    "root": {
+      "type": "object",
+      "required": [
+        "root_cause_id",
+        "state",
+        "invariant",
+        "causal_explanation",
+        "created_at",
+        "reconciliation_complete",
+        "introducing_cycle_id",
+        "fixing_cycle_ids",
+        "verifying_cycle_ids",
+        "closure_event_id",
+        "closure_gate",
+        "historical_escape_count_baseline",
+        "historical_escape_evidence_refs"
+      ],
+      "properties": {
+        "root_cause_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "$ref": "#/$defs/rootState"
+        },
+        "previous_state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/rootState"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blocked_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "block_code": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "second-escape-astra-required",
+            "historical-baseline-unresolved",
+            null
+          ]
+        },
+        "threshold_anchor": {
+          "$ref": "#/$defs/thresholdAnchor"
+        },
+        "invariant": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "causal_explanation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "created_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "reconciliation_complete": {
+          "type": "boolean"
+        },
+        "first_observation_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "escape_count_lifetime": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "introducing_cycle_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "fixing_cycle_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verifying_cycle_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "closure_event_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "closure_gate": {
+          "$ref": "#/$defs/closureGate"
+        },
+        "historical_escape_count_baseline": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "historical_escape_evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "first_threshold_activation_event_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "historical_baseline_reconciliation_event_id": {
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "blocked"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "required": [
+              "previous_state",
+              "blocked_reason"
+            ],
+            "properties": {
+              "previous_state": {
+                "type": "string",
+                "enum": [
+                  "open",
+                  "repairing",
+                  "awaiting_post_repair_review",
+                  "closure_pending",
+                  "closed_verified"
+                ]
+              },
+              "blocked_reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "closure_pending",
+                  "closed_verified"
+                ]
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "invariant": {
+                "type": "string",
+                "minLength": 1
+              },
+              "causal_explanation": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reconciliation_complete": {
+                "const": true
+              },
+              "closure_gate": {
+                "$ref": "#/$defs/pendingClosureGate"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "closed_verified"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "closure_event_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "closure_gate": {
+                "$ref": "#/$defs/verifiedClosureGate"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "reconciliation_complete": {
+                "const": true
+              }
+            },
+            "required": [
+              "reconciliation_complete"
+            ]
+          },
+          "then": {
+            "properties": {
+              "historical_escape_count_baseline": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "historical_escape_evidence_refs": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": true
+    },
+    "ordinaryObservation": {
+      "type": "object",
+      "required": [
+        "observation_id",
+        "root_cause_id",
+        "root_relationship",
+        "discovery_provenance",
+        "severity",
+        "status",
+        "confirmed",
+        "observed_at",
+        "evidence_refs",
+        "discovering_activity_ids",
+        "activity_ids",
+        "introducing_cycle_id",
+        "fixing_cycle_id",
+        "verifying_cycle_id",
+        "pre_cutover",
+        "detected_cycle_id"
+      ],
+      "properties": {
+        "observation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "root_cause_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "root_relationship": {
+          "$ref": "#/$defs/rootRelationship"
+        },
+        "discovery_provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "severity": {
+          "enum": [
+            "P0",
+            "P1",
+            "P2",
+            "P3",
+            "question"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confirmed": {
+          "type": "boolean"
+        },
+        "observed_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "activity_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "repair_attempt_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "review_basis_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "cycle_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "discovering_activity_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "introducing_cycle_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "fixing_cycle_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "verifying_cycle_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "pre_cutover": {
+          "type": "boolean"
+        },
+        "detected_cycle_id": {
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "additionalProperties": true,
+      "not": {"required": ["record_kind"]},
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "pre_cutover": {
+                "const": false
+              }
+            },
+            "required": [
+              "pre_cutover"
+            ]
+          },
+          "then": {
+            "properties": {
+              "detected_cycle_id": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "pre_cutover": {
+                "const": true
+              }
+            },
+            "required": [
+              "pre_cutover"
+            ]
+          },
+          "then": {
+            "properties": {
+              "detected_cycle_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "historicalReviewedArtifact": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["artifact", "digest_kind", "value"],
+          "properties": {
+            "artifact": {"type": "string", "minLength": 1, "maxLength": 512},
+            "digest_kind": {"const": "sha256"},
+            "value": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["artifact", "digest_kind", "value"],
+          "properties": {
+            "artifact": {"type": "string", "minLength": 1, "maxLength": 512},
+            "digest_kind": {"const": "sha256-prefix"},
+            "value": {"type": "string", "pattern": "^[0-9a-f]{1,63}$"}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["artifact", "digest_kind", "value", "unavailable_reason"],
+          "properties": {
+            "artifact": {"type": "string", "minLength": 1, "maxLength": 512},
+            "digest_kind": {"const": "unavailable"},
+            "value": {"type": "null"},
+            "unavailable_reason": {"type": "string", "minLength": 1, "maxLength": 512, "pattern": "\\S"}
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "historicalReport": {
+      "type": "object",
+      "required": [
+        "reported_episode", "predecessor_observation_id", "source_report_refs",
+        "historical_chronology", "chronology_unavailable_reason", "execution_lineage",
+        "execution_lineage_unavailable_reason", "report_bytes_sha256",
+        "report_bytes_unavailable_reason", "reviewed_artifacts", "reported_finding",
+        "failed_approach_summary", "actual_runtime_identity", "actual_token_usage"
+      ],
+      "properties": {
+        "reported_episode": {"type": "integer", "minimum": 0, "maximum": 2},
+        "predecessor_observation_id": {"$ref": "#/$defs/nullableId"},
+        "source_report_refs": {"$ref": "#/$defs/boundedSortedUniqueEvidenceRefs"},
+        "historical_chronology": {"const": "unknown"},
+        "chronology_unavailable_reason": {"type": "string", "minLength": 1, "maxLength": 512, "pattern": "\\S"},
+        "execution_lineage": {"const": "incomplete"},
+        "execution_lineage_unavailable_reason": {"type": "string", "minLength": 1, "maxLength": 512, "pattern": "\\S"},
+        "report_bytes_sha256": {"type": "null"},
+        "report_bytes_unavailable_reason": {"type": "string", "minLength": 1, "maxLength": 512, "pattern": "\\S"},
+        "reviewed_artifacts": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "#/$defs/historicalReviewedArtifact"}},
+        "reported_finding": {"type": "string", "minLength": 1, "maxLength": 2048},
+        "failed_approach_summary": {"type": ["string", "null"], "minLength": 1, "maxLength": 2048},
+        "actual_runtime_identity": {"type": "null"},
+        "actual_token_usage": {"type": "null"}
+      },
+      "additionalProperties": false
+    },
+    "boundedSortedUniqueEvidenceRefs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1, "maxLength": 512, "pattern": "\\S"}
+    },
+    "historicalObservation": {
+      "type": "object",
+      "required": [
+        "record_kind", "observation_id", "root_cause_id", "root_relationship",
+        "discovery_provenance", "severity", "status", "confirmed", "observed_at",
+        "pre_cutover", "discovering_activity_ids", "activity_ids", "repair_attempt_id",
+        "review_basis_id", "cycle_id", "introducing_cycle_id", "fixing_cycle_id",
+        "verifying_cycle_id", "detected_cycle_id", "import_event_id", "evidence_refs",
+        "historical_report"
+      ],
+      "properties": {
+        "record_kind": {"const": "historical-report-import-v1"},
+        "observation_id": {"type": "string", "minLength": 1},
+        "root_cause_id": {"type": "string", "minLength": 1},
+        "root_relationship": {"enum": ["initial", "repair-induced"]},
+        "discovery_provenance": {"const": "report-import"},
+        "severity": {"const": "P1"},
+        "status": {"const": "confirmed-from-report"},
+        "confirmed": {"const": true},
+        "observed_at": {"type": "null"},
+        "pre_cutover": {"type": "null"},
+        "discovering_activity_ids": {"type": "array", "maxItems": 0},
+        "activity_ids": {"type": "array", "maxItems": 0},
+        "repair_attempt_id": {"type": "null"},
+        "review_basis_id": {"type": "null"},
+        "cycle_id": {"type": "null"},
+        "introducing_cycle_id": {"type": "null"},
+        "fixing_cycle_id": {"type": "null"},
+        "verifying_cycle_id": {"type": "null"},
+        "detected_cycle_id": {"type": "null"},
+        "import_event_id": {"type": "string", "minLength": 1},
+        "evidence_refs": {"$ref": "#/$defs/boundedSortedUniqueEvidenceRefs"},
+        "historical_report": {"$ref": "#/$defs/historicalReport"}
+      },
+      "additionalProperties": false
+    },
+    "observation": {
+      "oneOf": [
+        {"$ref": "#/$defs/ordinaryObservation"},
+        {"$ref": "#/$defs/historicalObservation"}
+      ]
+    },
+    "reviewBasis": {
+      "type": "object",
+      "required": [
+        "review_basis_id",
+        "artifact_fingerprint",
+        "closure_boundary_fingerprint",
+        "requirements_authority_fingerprint",
+        "toolchain_dependency_fingerprint",
+        "mandatory_check_set_fingerprint"
+      ],
+      "properties": {
+        "review_basis_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifact_fingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "closure_boundary_fingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirements_authority_fingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "toolchain_dependency_fingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mandatory_check_set_fingerprint": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "cycle": {
+      "type": "object",
+      "required": [
+        "cycle_id",
+        "sequence",
+        "started_at",
+        "completed_at",
+        "complete",
+        "review_basis_id",
+        "activity_ids",
+        "kind"
+      ],
+      "properties": {
+        "cycle_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "started_at": {
+          "anyOf": [{"$ref": "#/$defs/timestamp"}, {"type": "null"}]
+        },
+        "completed_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "review_basis_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "activity_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "kind": {
+          "enum": [
+            "post-repair",
+            "unchanged-closure",
+            "other"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "testEvidence": {
+      "type": "object",
+      "required": [
+        "test_evidence_id",
+        "root_cause_id",
+        "kind",
+        "identity",
+        "execution_activity_id",
+        "result",
+        "executed_at",
+        "review_basis_id"
+      ],
+      "properties": {
+        "test_evidence_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "root_cause_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "original-reproduction",
+            "exact-recurrence",
+            "same-root-sibling",
+            "affected-regression"
+          ]
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "execution_activity_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "enum": [
+            "pass",
+            "fail",
+            "blocked"
+          ]
+        },
+        "executed_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "review_basis_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "repairAttempt": {
+      "type": "object",
+      "required": [
+        "repair_attempt_id",
+        "root_cause_id",
+        "strategy_id",
+        "started_at",
+        "review_basis_id",
+        "status",
+        "introducing_cycle_id",
+        "fixing_cycle_id",
+        "verifying_cycle_id"
+      ],
+      "properties": {
+        "repair_attempt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "root_cause_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "strategy_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "started_at": {
+          "anyOf": [{"$ref": "#/$defs/timestamp"}, {"type": "null"}]
+        },
+        "completed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "review_basis_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "implementation_activity_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verification_activity_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "introducing_cycle_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "fixing_cycle_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "verifying_cycle_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "authorization_event_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "authorization_basis_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "authorization_epoch_event_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "reservation_event_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "record_kind": {"type": "string"},
+        "created_at": {"anyOf": [{"$ref": "#/$defs/timestamp"}, {"type": "null"}]},
+        "expected_authorization_event_id": {"$ref": "#/$defs/nullableId"}
+      },
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if": {"properties": {"record_kind": {"const": "reservation"}}, "required": ["record_kind"]},
+          "then": {
+            "required": ["created_at", "authorization_basis_id", "authorization_epoch_event_id", "authorization_event_id", "expected_authorization_event_id", "reservation_event_id"],
+            "properties": {
+              "status": {"const": "planned"},
+              "started_at": {"type": "null"},
+              "completed_at": {"type": "null"},
+              "authorization_event_id": {"type": "null"},
+              "created_at": {"$ref": "#/$defs/timestamp"},
+              "authorization_basis_id": {"type": "string", "minLength": 1},
+              "authorization_epoch_event_id": {"type": "string", "minLength": 1},
+              "reservation_event_id": {"type": "string", "minLength": 1},
+              "expected_authorization_event_id": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      ]
+    },
+    "strategy": {
+      "type": "object",
+      "required": [
+        "strategy_id",
+        "root_cause_id",
+        "description",
+        "created_at",
+        "failed_predecessor_strategy_ids",
+        "disposition",
+        "decision_evidence_refs"
+      ],
+      "properties": {
+        "strategy_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "root_cause_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "created_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "failed_predecessor_strategy_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "astra_adjudication_activity_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "materially_different_from_predecessors": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "disposition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "threshold_escape_event_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "threshold_event_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "decision_evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "authorization_basis_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "authorization_epoch_event_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "implementation_activity_ids": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "failed_predecessor_report_observation_ids": {
+          "type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "material_difference_explanation": {
+          "type": "string", "minLength": 1, "maxLength": 8192
+        },
+        "import_origin_decision_binding": {
+          "$ref": "#/$defs/importOriginDecisionBinding"
+        },
+        "import_origin_decision_binding_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "anyOf": [
+        {"required": ["threshold_event_id"]},
+        {"required": ["threshold_escape_event_id"]}
+      ],
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if": {"required": ["failed_predecessor_report_observation_ids"]},
+          "then": {
+            "required": [
+              "materially_different_from_predecessors", "material_difference_explanation",
+              "import_origin_decision_binding", "import_origin_decision_binding_sha256"
+            ],
+            "properties": {"materially_different_from_predecessors": {"const": true}}
+          }
+        }
+      ]
+    },
+    "importOriginDecisionBinding": {
+      "type": "object",
+      "required": [
+        "schema_version", "task_instance_id", "root_cause_id", "catalogue_entry_id",
+        "catalogue_sha256", "report_import_event_id", "activation_event_id",
+        "decision_trigger_event_id", "authorization_epoch_event_id", "repair_attempt_id",
+        "strategy_id", "authorization_basis_id", "implementation_activity_ids",
+        "imported_predecessor_payloads", "failed_predecessor_strategy_ids",
+        "material_difference_explanation", "review_basis", "current_artifacts"
+      ],
+      "properties": {
+        "schema_version": {"const": "mas1-import-origin-decision-binding.v1"},
+        "task_instance_id": {"$ref": "#/$defs/uuid"},
+        "root_cause_id": {"type": "string", "minLength": 1},
+        "catalogue_entry_id": {"type": "string", "minLength": 1},
+        "catalogue_sha256": {"$ref": "#/$defs/sha256"},
+        "report_import_event_id": {"type": "string", "minLength": 1},
+        "activation_event_id": {"type": "string", "minLength": 1},
+        "decision_trigger_event_id": {"type": "string", "minLength": 1},
+        "authorization_epoch_event_id": {"type": "string", "minLength": 1},
+        "repair_attempt_id": {"type": "string", "minLength": 1},
+        "strategy_id": {"type": "string", "minLength": 1},
+        "authorization_basis_id": {"type": "string", "minLength": 1},
+        "implementation_activity_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "imported_predecessor_payloads": {
+          "type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true,
+          "items": {
+            "type": "object", "required": ["observation_id", "payload_sha256"],
+            "properties": {
+              "observation_id": {"type": "string", "minLength": 1},
+              "payload_sha256": {"$ref": "#/$defs/sha256"}
+            },
+            "additionalProperties": false
+          }
+        },
+        "failed_predecessor_strategy_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "material_difference_explanation": {"type": "string", "minLength": 1, "maxLength": 8192},
+        "review_basis": {
+          "type": "object",
+          "required": ["review_basis_id", "artifact_fingerprint", "closure_boundary_fingerprint", "requirements_authority_fingerprint", "toolchain_dependency_fingerprint", "mandatory_check_set_fingerprint"],
+          "properties": {
+            "review_basis_id": {"type": "string", "minLength": 1},
+            "artifact_fingerprint": {"$ref": "#/$defs/sha256"},
+            "closure_boundary_fingerprint": {"$ref": "#/$defs/sha256"},
+            "requirements_authority_fingerprint": {"$ref": "#/$defs/sha256"},
+            "toolchain_dependency_fingerprint": {"$ref": "#/$defs/sha256"},
+            "mandatory_check_set_fingerprint": {"$ref": "#/$defs/sha256"}
+          },
+          "additionalProperties": false
+        },
+        "current_artifacts": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {
+            "type": "object", "required": ["artifact", "sha256"],
+            "properties": {
+              "artifact": {"type": "string", "minLength": 1, "maxLength": 512},
+              "sha256": {"$ref": "#/$defs/sha256"}
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "activity": {
+      "type": "object",
+      "required": [
+        "activity_id",
+        "type",
+        "status",
+        "started_at",
+        "completed_at",
+        "requested",
+        "actual",
+        "runtime_verified",
+        "runtime_unavailable_reason",
+        "session_id",
+        "session_id_unavailable_reason",
+        "thread_id",
+        "thread_id_unavailable_reason",
+        "token_usage",
+        "attribution_mode",
+        "root_cause_ids"
+      ],
+      "properties": {
+        "activity_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "started_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "completed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "requested": {
+          "$ref": "#/$defs/modelRoute"
+        },
+        "actual": {
+          "$ref": "#/$defs/modelRoute"
+        },
+        "runtime_verified": {
+          "type": "boolean"
+        },
+        "runtime_evidence": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "runtime_unavailable_reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "session_id": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "session_id_unavailable_reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "thread_id": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "thread_id_unavailable_reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "token_usage": {
+          "$ref": "#/$defs/tokenUsage"
+        },
+        "attribution_mode": {
+          "enum": [
+            "direct",
+            "shared",
+            "none"
+          ]
+        },
+        "root_cause_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "repair_attempt_id": {"$ref": "#/$defs/nullableId"},
+        "repair_attempt_bindings": {"type": "array", "items": {"type": "object", "required": ["root_cause_id", "repair_attempt_id"], "properties": {"root_cause_id": {"type": "string", "minLength": 1}, "repair_attempt_id": {"type": "string", "minLength": 1}}, "additionalProperties": true}},
+        "review_route": {
+          "enum": [
+            "named-terra-first-pass",
+            "generic-terra-first-pass",
+            "other"
+          ]
+        },
+        "fallback_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "attribution_mode": {
+                "const": "direct"
+              }
+            },
+            "required": [
+              "attribution_mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "root_cause_ids": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 1,
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "attribution_mode": {
+                "const": "shared"
+              }
+            },
+            "required": [
+              "attribution_mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "root_cause_ids": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "attribution_mode": {
+                "const": "none"
+              }
+            },
+            "required": [
+              "attribution_mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "root_cause_ids": {
+                "type": "array",
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "runtime_verified": {
+                "const": true
+              }
+            },
+            "required": [
+              "runtime_verified"
+            ]
+          },
+          "then": {
+            "required": [
+              "runtime_evidence",
+              "runtime_unavailable_reason"
+            ],
+            "properties": {
+              "runtime_evidence": {
+                "type": "string",
+                "minLength": 1
+              },
+              "runtime_unavailable_reason": {
+                "type": "null"
+              },
+              "actual": {
+                "required": [
+                  "model",
+                  "reasoning_effort"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reasoning_effort": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "runtime_verified": {
+                "const": false
+              }
+            },
+            "required": [
+              "runtime_verified"
+            ]
+          },
+          "then": {
+            "required": [
+              "runtime_unavailable_reason"
+            ],
+            "properties": {
+              "runtime_unavailable_reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "runtime_evidence": {
+                "type": "null"
+              },
+              "actual": {
+                "properties": {
+                  "model": { "type": "null" },
+                  "reasoning_effort": { "type": "null" },
+                  "profile": { "type": "null" }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "actual": {
+                "type": "object",
+                "properties": {
+                  "model": {
+                    "type": "null"
+                  }
+                },
+                "required": [
+                  "model"
+                ]
+              }
+            },
+            "required": [
+              "actual"
+            ]
+          },
+          "then": {
+            "properties": {
+              "runtime_verified": {
+                "const": false
+              },
+              "runtime_unavailable_reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "actual": {
+                "type": "object",
+                "properties": {
+                  "reasoning_effort": {
+                    "type": "null"
+                  }
+                },
+                "required": [
+                  "reasoning_effort"
+                ]
+              }
+            },
+            "required": [
+              "actual"
+            ]
+          },
+          "then": {
+            "properties": {
+              "runtime_verified": {
+                "const": false
+              },
+              "runtime_unavailable_reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "session_id": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "session_id"
+            ]
+          },
+          "then": {
+            "required": [
+              "session_id_unavailable_reason"
+            ],
+            "properties": {
+              "session_id_unavailable_reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "session_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "session_id"
+            ]
+          },
+          "then": {
+            "properties": {
+              "session_id_unavailable_reason": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "thread_id": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "thread_id"
+            ]
+          },
+          "then": {
+            "required": [
+              "thread_id_unavailable_reason"
+            ],
+            "properties": {
+              "thread_id_unavailable_reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "thread_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "thread_id"
+            ]
+          },
+          "then": {
+            "properties": {
+              "thread_id_unavailable_reason": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "runtime_verified": {
+                "const": true
+              }
+            },
+            "required": [
+              "runtime_verified"
+            ]
+          },
+          "then": {
+            "properties": {
+              "actual": {
+                "properties": {
+                  "profile": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "profile"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "modelRoute": {
+      "type": "object",
+      "required": [
+        "model",
+        "reasoning_effort",
+        "profile"
+      ],
+      "properties": {
+        "model": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reasoning_effort": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "profile": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "tokenUsage": {
+      "type": "object",
+      "required": [
+        "input",
+        "output",
+        "reasoning",
+        "total",
+        "source",
+        "unavailable_reason",
+        "reasoning_unavailable_reason"
+      ],
+      "properties": {
+        "input": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "output": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "reasoning": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "reasoning_unavailable_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "total": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "source": {
+          "enum": [
+            "runtime-reported",
+            "unavailable"
+          ]
+        },
+        "unavailable_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "const": "runtime-reported"
+              }
+            },
+            "required": [
+              "source"
+            ]
+          },
+          "then": {
+            "properties": {
+              "input": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "output": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "total": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "reasoning": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "reasoning": {
+                      "type": "null"
+                    }
+                  },
+                  "required": [
+                    "reasoning"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "reasoning_unavailable_reason"
+                  ],
+                  "properties": {
+                    "reasoning_unavailable_reason": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "const": "unavailable"
+              }
+            },
+            "required": [
+              "source"
+            ]
+          },
+          "then": {
+            "properties": {
+              "input": {
+                "type": "null"
+              },
+              "output": {
+                "type": "null"
+              },
+              "reasoning": {
+                "type": "null"
+              },
+              "total": {
+                "type": "null"
+              },
+              "unavailable_reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "const": "runtime-reported"
+              }
+            },
+            "required": [
+              "source"
+            ]
+          },
+          "then": {
+            "properties": {
+              "total": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": true
+    },
+    "ordinaryEvent": {
+      "type": "object",
+      "required": [
+        "event_id",
+        "sequence",
+        "at",
+        "type",
+        "causal_refs",
+        "root_cause_id",
+        "observation_id",
+        "repair_attempt_id",
+        "review_basis_id",
+        "cycle_id",
+        "root_relationship",
+        "escape_key"
+      ],
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "type": {
+          "enum": [
+            "root-opened",
+            "observation-confirmed",
+            "root-reopened",
+            "repair-attempted",
+            "repair-reserved",
+            "astra-adjudication-started",
+            "astra-adjudicated",
+            "strategy-recorded",
+            "escape-confirmed",
+            "closure-pending",
+            "root-closed-verified",
+            "root-blocked",
+            "basis-invalidated",
+            "historical-threshold-reconciled",
+            "cutover-reconciled",
+            "activity-recorded"
+            ,"threshold-activated"
+            ,"repair-threshold-settled"
+          ]
+        },
+        "causal_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "root_cause_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "observation_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "repair_attempt_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "review_basis_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "cycle_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "root_relationship": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/rootRelationship"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "escape_key": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "required": [
+                "root_cause_id",
+                "repair_attempt_id",
+                "review_basis_id",
+                "cycle_id"
+              ],
+              "properties": {
+                "root_cause_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "repair_attempt_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "review_basis_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "cycle_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "threshold_escape_event_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "threshold_event_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "reconciled_baseline": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "successor_strategy_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "adjudication_activity_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "adjudication_start_event_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "reservation_event_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "strategy_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "disposition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "decision_evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "activation_anchor_event_id": {"$ref": "#/$defs/nullableId"},
+        "first_threshold_known_at": {"anyOf": [{"$ref": "#/$defs/timestamp"}, {"type": "null"}]},
+        "original_protocol_adopted_at": {"anyOf": [{"$ref": "#/$defs/timestamp"}, {"type": "null"}]},
+        "effective_at": {"anyOf": [{"$ref": "#/$defs/timestamp"}, {"type": "null"}]},
+        "historical_baseline_reconciliation_event_id": {"$ref": "#/$defs/nullableId"},
+        "started_at": {"anyOf": [{"$ref": "#/$defs/timestamp"}, {"type": "null"}]},
+        "start_event_id": {"$ref": "#/$defs/nullableId"},
+        "terminal_outcome": {"type": ["string", "null"]},
+        "settled_at": {"anyOf": [{"$ref": "#/$defs/timestamp"}, {"type": "null"}]},
+        "mutation_finished_at": {"anyOf": [{"$ref": "#/$defs/timestamp"}, {"type": "null"}]}
+      },
+      "additionalProperties": true,
+      "not": {"required": ["record_kind"]},
+      "allOf": [
+        {
+          "if": {"properties": {"type": {"const": "repair-reserved"}}, "required": ["type"]},
+          "then": {
+            "required": ["root_cause_id", "repair_attempt_id", "review_basis_id", "reservation_event_id"],
+            "properties": {
+              "root_cause_id": {"type": "string", "minLength": 1},
+              "repair_attempt_id": {"type": "string", "minLength": 1},
+              "review_basis_id": {"type": "string", "minLength": 1},
+              "reservation_event_id": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"type": {"const": "astra-adjudication-started"}}, "required": ["type"]},
+          "then": {
+            "required": ["root_cause_id", "repair_attempt_id", "adjudication_activity_id"],
+            "properties": {
+              "root_cause_id": {"type": "string", "minLength": 1},
+              "repair_attempt_id": {"type": "string", "minLength": 1},
+              "adjudication_activity_id": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "escape-confirmed"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "root_cause_id",
+              "observation_id",
+              "repair_attempt_id",
+              "review_basis_id",
+              "cycle_id",
+              "root_relationship",
+              "escape_key"
+            ],
+            "properties": {
+              "root_cause_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "observation_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "repair_attempt_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "review_basis_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "cycle_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "root_relationship": {
+                "enum": [
+                  "exact-recurrence",
+                  "same-root-sibling",
+                  "repair-induced",
+                  "expected-fallout"
+                ]
+              },
+              "escape_key": {
+                "type": "object",
+                "required": [
+                  "root_cause_id",
+                  "repair_attempt_id",
+                  "review_basis_id",
+                  "cycle_id"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "astra-adjudicated"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "root_cause_id",
+              "successor_strategy_id",
+              "adjudication_activity_id",
+              "disposition",
+              "decision_evidence_refs"
+            ],
+            "properties": {
+              "root_cause_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "threshold_event_id": {"type": "string", "minLength": 1},
+              "successor_strategy_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "adjudication_activity_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "disposition": {
+                "const": "approved"
+              },
+              "decision_evidence_refs": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {"properties": {"type": {"const": "historical-threshold-reconciled"}}, "required": ["type"]},
+          "then": {
+            "required": ["root_cause_id", "reconciled_baseline"],
+            "properties": {
+              "root_cause_id": {"type": "string", "minLength": 1},
+              "reconciled_baseline": {"type": "integer", "minimum": 2},
+              "evidence_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "pattern": "\\S"}},
+              "historical_evidence_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "pattern": "\\S"}}
+            },
+            "anyOf": [{"required": ["evidence_refs"]}, {"required": ["historical_evidence_refs"]}]
+          }
+        }
+      ]
+    },
+    "historicalReportImportEvent": {
+      "type": "object",
+      "required": [
+        "record_kind", "schema_version", "type", "event_id", "sequence", "at",
+        "root_cause_id", "causal_refs", "evidence_refs", "at_semantics",
+        "catalogue_entry_id", "catalogue_sha256", "import_activity_id",
+        "observation_bindings", "observation_id", "repair_attempt_id",
+        "review_basis_id", "cycle_id", "root_relationship", "escape_key"
+      ],
+      "properties": {
+        "record_kind": {"const": "historical-report-import-event-v1"},
+        "schema_version": {"const": "mas1-historical-report-import-event.v1"},
+        "type": {"const": "historical-report-imported"},
+        "event_id": {"type": "string", "minLength": 1},
+        "sequence": {"type": "integer", "minimum": 1},
+        "at": {"$ref": "#/$defs/timestamp"},
+        "root_cause_id": {"type": "string", "minLength": 1},
+        "causal_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "evidence_refs": {"$ref": "#/$defs/boundedSortedUniqueEvidenceRefs"},
+        "at_semantics": {"const": "administrative-import-time"},
+        "catalogue_entry_id": {"type": "string", "minLength": 1},
+        "catalogue_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "import_activity_id": {"type": "string", "minLength": 1},
+        "observation_bindings": {
+          "type": "array", "minItems": 3, "maxItems": 3,
+          "items": {
+            "type": "object", "required": ["observation_id", "payload_sha256"],
+            "properties": {
+              "observation_id": {"type": "string", "minLength": 1},
+              "payload_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            },
+            "additionalProperties": false
+          }
+        },
+        "observation_id": {"type": "null"},
+        "repair_attempt_id": {"type": "null"},
+        "review_basis_id": {"type": "null"},
+        "cycle_id": {"type": "null"},
+        "root_relationship": {"type": "null"},
+        "escape_key": {"type": "null"}
+      },
+      "additionalProperties": false
+    },
+    "event": {
+      "oneOf": [
+        {"$ref": "#/$defs/ordinaryEvent"},
+        {"$ref": "#/$defs/historicalReportImportEvent"}
+      ]
+    },
+    "thresholdAnchor": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind", "threshold_escape_event_id"],
+          "properties": {
+            "kind": {"const": "post-cutover-escape"},
+            "threshold_escape_event_id": {"type": "string", "minLength": 1}
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": ["kind", "report_import_event_id"],
+          "properties": {
+            "kind": {"const": "historical-report-lower-bound"},
+            "report_import_event_id": {"type": "string", "minLength": 1}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["kind", "historical_threshold_reconciled_event_id", "reconciled_baseline"],
+          "properties": {
+            "kind": {"const": "historical-baseline"},
+            "historical_threshold_reconciled_event_id": {"type": "string", "minLength": 1},
+            "reconciled_baseline": {"type": "integer", "minimum": 2}
+          },
+          "additionalProperties": true
+        },
+        {"type": "null"}
+      ]
+    },
+    "closureGate": {
+      "type": "object",
+      "required": [
+        "original_reproduction_test_evidence_id",
+        "exact_recurrence_test_evidence_ids",
+        "same_root_sibling_test_evidence_ids",
+        "repair_attempt_id",
+        "post_repair_review_cycle_id",
+        "post_repair_review_activity_id",
+        "following_unchanged_cycle_id",
+        "following_unchanged_activity_id",
+        "review_basis_id"
+      ],
+      "properties": {
+        "original_reproduction_test_evidence_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "exact_recurrence_test_evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "same_root_sibling_test_evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "repair_attempt_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "post_repair_review_cycle_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "post_repair_review_activity_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "following_unchanged_cycle_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "following_unchanged_activity_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "review_basis_id": {
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "additionalProperties": true
+    },
+    "pendingClosureGate": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/closureGate"
+        },
+        {
+          "properties": {
+            "original_reproduction_test_evidence_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "exact_recurrence_test_evidence_ids": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              }
+            },
+            "same_root_sibling_test_evidence_ids": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              }
+            },
+            "repair_attempt_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "post_repair_review_cycle_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "post_repair_review_activity_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "review_basis_id": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "verifiedClosureGate": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/pendingClosureGate"
+        },
+        {
+          "properties": {
+            "following_unchanged_cycle_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "following_unchanged_activity_id": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    }
+  },
+  "oneOf": [
+    {
+      "not": {
+        "required": [
+          "legacy_v6_0_audit"
+        ]
+      },
+      "properties": {
+        "cutover": {
+          "required": [
+            "post_cutover_boundary",
+            "protocol_adopted_at",
+            "protocol_adoption_evidence_refs"
+          ]
+        }
+      }
+    },
+    {
+      "required": [
+        "legacy_v6_0_audit"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schema_version",
+          "ledger_id",
+          "task",
+          "cutover",
+          "roots",
+          "observations",
+          "review_bases",
+          "cycles",
+          "test_evidence",
+          "repair_attempts",
+          "strategies",
+          "activities",
+          "events",
+          "metric_notes",
+          "telemetry",
+          "legacy_v6_0_audit"
+        ]
+      },
+      "properties": {
+        "cutover": {
+          "propertyNames": {
+            "enum": [
+              "cutover_id",
+              "prompt_sha256",
+              "legacy_reconciliation_complete",
+              "startup_protocol_version",
+              "initial_adopted_prompt_sha256",
+              "authority_migrated_at",
+              "authority_fingerprints",
+              "authority_migration_note"
+            ]
+          },
+          "allOf": [
+            {
+              "not": {
+                "required": [
+                  "post_cutover_boundary"
+                ]
+              }
+            },
+            {
+              "not": {
+                "required": [
+                  "protocol_adopted_at"
+                ]
+              }
+            },
+            {
+              "not": {
+                "required": [
+                  "protocol_adoption_evidence_refs"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "roots": {
+            "contains": {
+              "type": "object",
+              "properties": {
+                "state": {
+                  "enum": [
+                    "closure_pending",
+                    "closed_verified"
+                  ]
+                }
+              },
+              "required": [
+                "state"
+              ]
+            }
+          }
+        },
+        "required": [
+          "roots"
+        ]
+      },
+      "then": {
+        "properties": {
+          "cutover": {
+            "properties": {
+              "legacy_reconciliation_complete": {
+                "const": true
+              }
+            },
+            "required": [
+              "legacy_reconciliation_complete"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

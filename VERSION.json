@@ -1,0 +1,40 @@
+{
+  "protocol_version": "6.1",
+  "distribution_version": "6.1.0",
+  "packaged_on": "2026-10-09",
+  "canonical_prompt_sha256": "e8944e86049bb21196604a7a77470a7fe47a084cb8ddfed01964e2ef22a4b08f",
+  "source_bundle": "MAS1-v6.1-portable-20260918",
+  "source_sha256": {
+    "prompts/MAS1-v6.1-canonical.md": "e8944e86049bb21196604a7a77470a7fe47a084cb8ddfed01964e2ef22a4b08f",
+    "prompts/polishing-prompt-1.md": "812b7085ec47f05fd9226ba33158a9876e743c9e624217cfc0a5bb865523288f",
+    "profiles/codex-reference/mas1_reviewer_astra.toml": "875b03e208ae2625870539dd5963a74ea7966a6ebd5737e89c6d49207049a7ba",
+    "profiles/codex-reference/mas1_worker_terra.toml": "97f44a92e005e3ff93df20f38c4df704f45a964181de5522820d1f1848d51ff6",
+    "profiles/codex-reference/mas1_reviewer_terra.toml": "58c8d06229924ed49f1a865b9570de1dce2844dc38f8a573089728740e608be9",
+    "profiles/codex-reference/mas1_proposer_terra.toml": "53a6c5d86c0a6d235cb78bdf74dad1b35d994b31b8c9568f109ba4cfa5268559",
+    "profiles/codex-reference/mas1_judge_astra.toml": "1cbba0b102981eb9a112ffd633c52560db8b02b283f9a2cf5a4ad5176217dfc1",
+    "profiles/codex-reference/mas1_splitter_sol.toml": "660c2841457a1496e47ea596faf54609555481304af983bfd418939dbac5bc6f",
+    "profiles/codex-reference/mas1_scout_luna.toml": "548261956e8a40a8807d507f40af9f9fef20a1002b462cf5994aa7657d4e866b",
+    "profiles/codex-reference/mas1_reviewer_sol.toml": "67329f36ddd9b61d439cbd29e51e59d91dd4f7edc706be477324ec2ccb5f6064",
+    "profiles/codex-reference/mas1_executor_sol.toml": "8bbadd65b5f0537d5435736cda964f5166aeb93b8ca47ce80d0be57b0e41340f",
+    "profiles/codex-reference/mas1_scout_spark.toml": "d5ed05b00f0e23c92af5a69bbc1f207209c067f7b55222a2624c4e4f8996ff91",
+    "profiles/codex-reference/mas1_reconciler_astra.toml": "77478e7e671a7e354a708a67bbf8ce6799f9b2634aaaa3dfe304c37ccf2960d9",
+    "profiles/codex-reference/mas1_worker_spark.toml": "a52b9ad72b1df659b0df0b1f2bac38dd8bfe3c09d0ed594c2c673bdf6d18747a",
+    "templates/reconciler-entry-checklist.md": "6fb215e32b655624ff3b67a5dee2aeabb0a664ad95f7fb76fd862b2e630bd82a",
+    "templates/task-packet.md": "13695cb65b31d615d5c48f4599ca8333c0348c8af7f96bf519938ab6da13e7f4",
+    "templates/finding-ledger.md": "9232b7e4858f4a8d180943aad91a8dc2cb9d7bb7e5031709370e48bec4a8fb3e",
+    "templates/requirement-ledger.md": "bfba386b23f79fd75b4e7115873169d0af89da46f307a295e365d2f86ea8c978",
+    "templates/splitter-assessment.md": "9ff35db6511b9d7f347b734639b97bbac7ceaee808a8d72736ce3578d197b495",
+    "tools/mas1_ledger_core.py": "585cc167339c020b1902581a16b413d0853a3c7efcdba3d4b1cdf2aaf13b9e8f",
+    "tools/analyze-mas1-ledgers.py": "c1505b6453e4a729066d5830de5cffe6ec81dbacf4f318ef1a94710c0edce3cb",
+    "tools/validate-mas1-ledger-fixtures.py": "61627e49ba9512c874f17da79b78bf35b82119310ac034cc7cb3727895265d1f",
+    "tools/mas1-finding-ledger-v1.schema.json": "dca5c680132b4b00e052709167c8c1d5ab8b22f8056a20e0f3f9ae923ddf471b",
+    "tools/mas1-ledger-fixtures.json": "9f2fe85fa5649fd1f150bf1a11003bc4016d6a75b00dae9487b181be79b14f7e",
+    "tools/test_mas1_ledger_core.py": "91375d1aafb37b95f0243a8ffb35776ca38f360719109ce9a7e2901b64a2f4b6"
+  },
+  "notes": [
+    "The canonical prompt and twelve reference profiles are unchanged.",
+    "Portable adaptation is separately versioned and is not canonical compliance.",
+    "Tool runtime paths are relative; historical compatibility catalogues are unchanged.",
+    "Private witness data and source-machine rollout records are not distributed."
+  ]
+}

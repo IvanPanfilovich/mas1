@@ -1,0 +1,14 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+.mas1/
+.mas1-system/backups/
+.mas1-system/install-receipt.json
+.env
+.env.*
+dist/
